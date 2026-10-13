@@ -30,12 +30,23 @@ The main finding is that no profile scores high on every dimension. Quality of l
 
 ```
 quality_of_life_index.R   # data preparation, imputation, PCA, clustering, profiling
-report.pdf                # full written report (Portuguese)
+install_packages.R        # installs the R packages used
+data/indicators/          # INE indicators used to build the index (one CSV per indicator)
+data/population/          # resident population, used to normalise count variables
+data/profile/             # passive variables used to profile the clusters
+results/                  # outputs of the script (imputed dataset, PCA scores, clusters, profiles)
+report_en.pdf             # full written report (English)
+report_pt.pdf             # original report (Portuguese)
 ```
 
 ## How to run
 
-The INE source files are not included. Download the indicators from the INE portal into the repository root (the script reads every `.csv` there, plus the `Habitantes - Normalizado/` and `Profile - Normalizado/` folders), then run `quality_of_life_index.R` from the repository root, with the packages listed below installed.
+```r
+source("install_packages.R")
+source("quality_of_life_index.R")
+```
+
+The script moves to its own folder, reads the INE files from `data/` and writes its outputs to `results/`, so it works from RStudio, `Rscript` or `source()` wherever the repository was downloaded. The `results/` folder already contains the outputs, so they can be inspected without running anything.
 
 ## Tech stack
 
@@ -43,4 +54,4 @@ R · psych · mice · VIM · factoextra · cluster · mclust · ggplot2 · pheat
 
 ## Team
 
-André Marques and Afonso Claudino. The full report with the team's methodology and discussion is in [`report.pdf`](report.pdf) (Portuguese).
+André Marques and Afonso Claudino. The full report with the team's methodology and discussion is in [`report_en.pdf`](report_en.pdf) (English) and [`report_pt.pdf`](report_pt.pdf) (original, Portuguese).

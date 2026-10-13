@@ -3,10 +3,22 @@ library(psych)
 
 rm(list = ls())
 
-# setwd("<path/to/this/repo>")  # run from the repository root
+# Paths are relative to the folder that contains this script, so it runs from
+# wherever the repository was downloaded. Input data is in data/, outputs go to results/.
+local({
+  dir <- tryCatch(dirname(normalizePath(sys.frame(1)$ofile)), error = function(e) NULL)
+  if (is.null(dir)) {
+    arg <- grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)
+    if (length(arg)) dir <- dirname(normalizePath(sub("^--file=", "", arg[1])))
+  }
+  if (is.null(dir) && requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::isAvailable())
+    dir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+  if (!is.null(dir) && nzchar(dir)) setwd(dir)
+})
+dir.create("results", showWarnings = FALSE)
 
 
-ficheiros_csv <- list.files(pattern = "\\.csv$", full.names = TRUE, recursive = FALSE)
+ficheiros_csv <- list.files("data/indicators", pattern = "\\.csv$", full.names = TRUE, recursive = FALSE)
 ficheiros_csv <- ficheiros_csv[!grepl("dataset_completo|Resultados_|Interpretacao_", basename(ficheiros_csv))]
 
 cat("Encontrados", length(ficheiros_csv), "ficheiros CSV (Indicadores)\n\n")
@@ -125,7 +137,7 @@ merged_data <- Reduce(function(x, y) merge(x, y, by = "ID_UNICO", all = TRUE), l
 
 
 cat("A carregar dados de população para normalização...\n")
-caminho_pop <- "Habitantes - Normalizado/População residente (N.º) por Local de residência .csv"
+caminho_pop <- "data/population/População residente (N.º) por Local de residência .csv"
 
 if (file.exists(caminho_pop)) {
   dados_pop <- read.csv2(caminho_pop, header = TRUE, fileEncoding = "Latin1", stringsAsFactors = FALSE)
@@ -267,7 +279,7 @@ dataset_final <- cbind(meta_data, dataset_numerico_imputado)
 cat("Imputação MICE (método CART) concluída com sucesso.\n")
 
 
-write.csv2(dataset_final, "dataset_completo_imputado.csv", row.names = FALSE, fileEncoding = "UTF-8")
+write.csv2(dataset_final, "results/dataset_completo_imputado.csv", row.names = FALSE, fileEncoding = "UTF-8")
 cat("\nFicheiro 'dataset_completo_imputado.csv' gerado com sucesso (UTF-8).\n")
 
 
@@ -279,7 +291,6 @@ print(head(dataset_final[, 1:min(5, ncol(dataset_final))]))
 
 
 rm(list = ls())
-# setwd("<path/to/this/repo>")  # run from the repository root
 
 
 if(!require(factoextra)) install.packages("factoextra")
@@ -291,7 +302,7 @@ library(ggplot2)
 library(corrplot)
 
 
-dados <- read.csv2("dataset_completo_imputado.csv", fileEncoding = "UTF-8", stringsAsFactors = FALSE)
+dados <- read.csv2("results/dataset_completo_imputado.csv", fileEncoding = "UTF-8", stringsAsFactors = FALSE)
 
 
 head(dados)
@@ -362,7 +373,7 @@ cargas <- unclass(pca_final$loadings)
 cargas_df <- as.data.frame(round(cargas, 3))
 
 cargas_df[abs(cargas_df) < 0.3] <- "" 
-write.csv2(cargas_df, "Interpretacao_Indices_Loadings.csv", row.names = TRUE, fileEncoding = "UTF-8")
+write.csv2(cargas_df, "results/Interpretacao_Indices_Loadings.csv", row.names = TRUE, fileEncoding = "UTF-8")
 
 
 fa.diagram(pca_final, main = "Estrutura dos Índices (Rotação Varimax)")
@@ -371,13 +382,12 @@ fa.diagram(pca_final, main = "Estrutura dos Índices (Rotação Varimax)")
 novos_indices <- cbind(dados[, 1:2], pca_final$scores) 
 
 
-write.csv2(novos_indices, "Resultados_Indices_PCA.csv", row.names = FALSE, fileEncoding = "UTF-8")
+write.csv2(novos_indices, "results/Resultados_Indices_PCA.csv", row.names = FALSE, fileEncoding = "UTF-8")
 
 
 
 rm(list = ls())
 graphics.off() 
-# setwd("<path/to/this/repo>")  # run from the repository root
 
 
 if(!require(factoextra)) install.packages("factoextra")
@@ -391,7 +401,7 @@ library(ggplot2)
 library(pheatmap)
 
 
-dados_pca <- read.csv2("Resultados_Indices_PCA.csv", fileEncoding = "UTF-8", stringsAsFactors = FALSE)
+dados_pca <- read.csv2("results/Resultados_Indices_PCA.csv", fileEncoding = "UTF-8", stringsAsFactors = FALSE)
 
 
 head(dados_pca)
@@ -479,7 +489,7 @@ print("\n--- PERFIL DOS CLUSTERS (Médias dos Scores) ---")
 print(perfil_medias_print)
 
 
-write.csv2(perfil_medias, "Resumo_Perfil_Clusters.csv", row.names = FALSE, fileEncoding = "UTF-8")
+write.csv2(perfil_medias, "results/Resumo_Perfil_Clusters.csv", row.names = FALSE, fileEncoding = "UTF-8")
 
 
 cols_indices <- names(perfil_medias)[-1]
@@ -528,7 +538,7 @@ limpar_nome <- function(nome) {
 }
 
 
-file_pop <- "Habitantes - Normalizado/População residente (N.º) por Local de residência .csv"
+file_pop <- "data/population/População residente (N.º) por Local de residência .csv"
 if(file.exists(file_pop)) {
   dados_pop <- read.csv2(file_pop, header = TRUE, fileEncoding = "Latin1", stringsAsFactors = FALSE)
   df_pop <- data.frame(
@@ -541,7 +551,7 @@ if(file.exists(file_pop)) {
 }
 
 
-path_profile <- "Profile - Normalizado"
+path_profile <- "data/profile"
 files_profile <- list.files(path_profile, pattern = "\\.csv$", full.names = TRUE)
 
 
@@ -610,7 +620,7 @@ perfil_ext_print <- perfil_ext_medias
 perfil_ext_print[,-1] <- round(perfil_ext_print[,-1], 6) 
 print(perfil_ext_print)
 
-write.csv2(perfil_ext_medias, "Resumo_Perfil_Externo.csv", row.names = FALSE, fileEncoding = "UTF-8")
+write.csv2(perfil_ext_medias, "results/Resumo_Perfil_Externo.csv", row.names = FALSE, fileEncoding = "UTF-8")
 
 
 perfil_ext_long <- data.frame(Cluster = integer(), Variavel = character(), Valor = numeric(), stringsAsFactors = FALSE)
@@ -713,7 +723,7 @@ dados_finais_completo <- merge(dados_finais, df_perfil_ext[, c("Codigo_Final", v
 mclust_class <- data.frame(Codigo_Final = dados_pca$Codigo_Final, Cluster_Probabilistico = mc_res$classification)
 dados_finais_completo <- merge(dados_finais_completo, mclust_class, by="Codigo_Final")
 
-write.csv2(dados_finais_completo, "Resultados_Clustering_Final.csv", row.names = FALSE, fileEncoding = "UTF-8")
+write.csv2(dados_finais_completo, "results/Resultados_Clustering_Final.csv", row.names = FALSE, fileEncoding = "UTF-8")
 
 cat("\nAnálise Concluída!\n")
 cat("1. Verifique a pasta para todos os novos PDFs ('Visualizacao_*.pdf').\n")

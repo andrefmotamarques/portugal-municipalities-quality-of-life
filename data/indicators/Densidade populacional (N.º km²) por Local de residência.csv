@@ -1,0 +1,309 @@
+Local de residência ;Densidade populacional (N.º/ km²) por Local de residência
+1111601: Arcos de Valdevez;46,6
+1111602: Caminha;120,4
+1111603: Melgaço;31,9
+1111604: Monção;85,3
+1111605: Paredes de Coura;63
+1111606: Ponte da Barca;61,4
+1111607: Ponte de Lima;128,4
+1111608: Valença;120,9
+1111609: Viana do Castelo;272
+1111610: Vila Nova de Cerveira;86
+1120301: Amares;238,9
+1120302: Barcelos;308,8
+1120303: Braga;1099,1
+1120306: Esposende;389,2
+1120310: Terras de Bouro;23
+1120313: Vila Verde;210,6
+1190304: Cabeceiras de Basto;64,3
+1190307: Fafe;221,4
+1190308: Guimarães;650,6
+1191705: Mondim de Basto;37,2
+1190309: Póvoa de Lanhoso;167,9
+1190311: Vieira do Minho;55,7
+1190312: Vila Nova de Famalicão;674,6
+1190314: Vizela;993,1
+11A0104: Arouca;63,6
+11A0107: Espinho;1538,1
+11A1304: Gondomar;1277,9
+11A1306: Maia;1719
+11A1308: Matosinhos;2876,6
+11A0113: Oliveira de Azeméis;417,6
+11A1310: Paredes;548,7
+11A1312: Porto;6006
+11A1313: Póvoa de Varzim;821,4
+11A0109: Santa Maria da Feira;647,8
+11A1314: Santo Tirso;496,7
+11A0116: São João da Madeira;3005,4
+11A1318: Trofa;555,5
+11A0119: Vale de Cambra;144,2
+11A1315: Valongo;1333,4
+11A1316: Vila do Conde;569,5
+11A1317: Vila Nova de Gaia;1847,5
+11B1702: Boticas;15,2
+11B1703: Chaves;63,3
+11B1706: Montalegre;11,4
+11B1709: Ribeira de Pena;27
+11B1712: Valpaços;26,6
+11B1713: Vila Pouca de Aguiar;26,9
+11C1301: Amarante;173,3
+11C1302: Baião;98,6
+11C0106: Castelo de Paiva;134,3
+11C0305: Celorico de Basto;97,5
+11C1804: Cinfães;72,8
+11C1303: Felgueiras;478,9
+11C1305: Lousada;502,8
+11C1307: Marco de Canaveses;245,6
+11C1309: Paços de Ferreira;788,6
+11C1311: Penafiel;331,3
+11C1813: Resende;79,1
+11D1701: Alijó;34,7
+11D1801: Armamar;48,2
+11D0403: Carrazeda de Ansiães;19,3
+11D0404: Freixo de Espada à Cinta;12,9
+11D1805: Lamego;145,9
+11D1704: Mesão Frio;130,8
+11D1807: Moimenta da Beira;44,2
+11D1707: Murça;27,8
+11D1812: Penedono;21
+11D1708: Peso da Régua;151,8
+11D1710: Sabrosa;35,9
+11D1711: Santa Marta de Penaguião;86,4
+11D1815: São João da Pesqueira;25,4
+11D1818: Sernancelhe;25,3
+11D1819: Tabuaço;37,7
+11D1820: Tarouca;76,1
+11D0409: Torre de Moncorvo;12,7
+11D0914: Vila Nova de Foz Côa;16
+11D1714: Vila Real;131,8
+11E0401: Alfândega da Fé;13,1
+11E0402: Bragança;30,2
+11E0405: Macedo de Cavaleiros;20,4
+11E0406: Miranda do Douro;12,9
+11E0407: Mirandela;32,5
+11E0408: Mogadouro;10,8
+11E0410: Vila Flor;22,7
+11E0411: Vimioso;8,7
+11E0412: Vinhais;10,7
+1910101: Águeda;140,8
+1910102: Albergaria-a-Velha;162,3
+1910103: Anadia;130,2
+1910105: Aveiro;435,5
+1910108: Estarreja;250,5
+1910110: Ílhavo;573,3
+1910112: Murtosa;151
+1910114: Oliveira do Bairro;286,9
+1910115: Ovar;384,1
+1910117: Sever do Vouga;84,3
+1910118: Vagos;148,3
+1920601: Arganil;34
+1920602: Cantanhede;89,3
+1920603: Coimbra;453,4
+1920604: Condeixa-a-Nova;126,6
+1920605: Figueira da Foz;160,1
+1920606: Góis;14,4
+1920607: Lousã;125,9
+1920111: Mealhada;178,8
+1920608: Mira;101
+1920609: Miranda do Corvo;95,9
+1920610: Montemor-o-Velho;108,7
+1921808: Mortágua;36,1
+1920611: Oliveira do Hospital;83
+1920612: Pampilhosa da Serra;10,4
+1920613: Penacova;59,6
+1920614: Penela;41,6
+1920615: Soure;65
+1920616: Tábua;58,1
+1920617: Vila Nova de Poiares;84,5
+1931002: Alvaiázere;39,6
+1931003: Ansião;67,4
+1931004: Batalha;160,2
+1931007: Castanheira de Pêra;40,6
+1931008: Figueiró dos Vinhos;30,4
+1931009: Leiria;236,8
+1931010: Marinha Grande;219
+1931013: Pedrógão Grande;28,2
+1931015: Pombal;83,1
+1931016: Porto de Mós;91,7
+1940901: Aguiar da Beira;25,6
+1941802: Carregal do Sal;78,5
+1941803: Castro Daire;36,2
+1941806: Mangualde;84,8
+1941809: Nelas;106
+1941810: Oliveira de Frades;67,2
+1941811: Penalva do Castelo;54,7
+1941814: Santa Comba Dão;97,6
+1941816: São Pedro do Sul;43,6
+1941817: Sátão;55,2
+1941821: Tondela;69,6
+1941822: Vila Nova de Paiva;27,1
+1941823: Viseu;201,1
+1941824: Vouzela;50,4
+1950502: Castelo Branco;36,8
+1950505: Idanha-a-Nova;6
+1950506: Oleiros;10,4
+1950507: Penamacor;8,5
+1950508: Proença-a-Nova;17,9
+1950509: Sertã;33,4
+1950510: Vila de Rei;18
+1950511: Vila Velha de Ródão;10,7
+1960902: Almeida;11
+1960501: Belmonte;52,3
+1960903: Celorico da Beira;26,7
+1960503: Covilhã;83,5
+1960904: Figueira de Castelo Rodrigo;9,9
+1960905: Fornos de Algodres;33,3
+1960504: Fundão;38,5
+1960906: Gouveia;40,7
+1960907: Guarda;56,2
+1960908: Manteigas;24,1
+1960909: Mêda;16
+1960910: Pinhel;16,2
+1960911: Sabugal;13,7
+1960912: Seia;49,2
+1960913: Trancoso;23
+1D11001: Alcobaça;140,5
+1D11101: Alenquer;158,8
+1D11102: Arruda dos Vinhos;196,5
+1D11005: Bombarral;153,2
+1D11104: Cadaval;82,5
+1D11006: Caldas da Rainha;211,8
+1D11108: Lourinhã;192,9
+1D11011: Nazaré;190,4
+1D11012: Óbidos;93,9
+1D11014: Peniche;355,3
+1D11112: Sobral de Monte Agraço;228
+1D11113: Torres Vedras;216,2
+1D21401: Abrantes;47,3
+1D21402: Alcanena;100,1
+1D21408: Constância;49,2
+1D21410: Entroncamento;1601,2
+1D21411: Ferreira do Zêzere;42,1
+1D21413: Mação;16
+1D21421: Ourém;111,6
+1D21417: Sardoal;39,3
+1D21418: Tomar;105
+1D21419: Torres Novas;128,6
+1D21420: Vila Nova da Barquinha;157,1
+1D31403: Almeirim;102,7
+1D31404: Alpiarça;76,9
+1D31103: Azambuja;87,3
+1D31405: Benavente;62
+1D31406: Cartaxo;154
+1D31407: Chamusca;11,4
+1D31409: Coruche;15,6
+1D31412: Golegã;64,5
+1D31414: Rio Maior;81,8
+1D31415: Salvaterra de Magos;95,7
+1D31416: Santarém;110,4
+1A01115: Amadora;7495,9
+1A01105: Cascais;2255
+1A01106: Lisboa;5668,5
+1A01107: Loures;1238,1
+1A01109: Mafra;309
+1A01116: Odivelas;5791,6
+1A01110: Oeiras;3829,1
+1A01111: Sintra;1239
+1A01114: Vila Franca de Xira;438,3
+1B01502: Alcochete;156,6
+1B01503: Almada;2588,7
+1B01504: Barreiro;2197,5
+1B01506: Moita;1247,7
+1B01507: Montijo;169,8
+1B01508: Palmela;156,8
+1B01510: Seixal;1814,2
+1B01511: Sesimbra;283,6
+1B01512: Setúbal;536,4
+1C11501: Alcácer do Sal;7,4
+1C11505: Grândola;17,2
+1C10211: Odemira;19,3
+1C11509: Santiago do Cacém;26,7
+1C11513: Sines;72,7
+1C20201: Aljustrel;19,5
+1C20202: Almodôvar;8,6
+1C20203: Alvito;8,6
+1C20204: Barrancos;8,5
+1C20205: Beja;29,5
+1C20206: Castro Verde;12,2
+1C20207: Cuba;26
+1C20208: Ferreira do Alentejo;12,2
+1C20209: Mértola;4,7
+1C20210: Moura;13,9
+1C20212: Ourique;7,3
+1C20213: Serpa;12,4
+1C20214: Vidigueira;16,5
+1C31201: Alter do Chão;8,8
+1C31202: Arronches;8,8
+1C31203: Avis;6,3
+1C31204: Campo Maior;32
+1C31205: Castelo de Vide;12,1
+1C31206: Crato;8,2
+1C31207: Elvas;32,3
+1C31208: Fronteira;12
+1C31209: Gavião;11,3
+1C31210: Marvão;19,5
+1C31211: Monforte;7,1
+1C31212: Nisa;9,9
+1C31213: Ponte de Sor;18,1
+1C31214: Portalegre;49
+1C31215: Sousel;15,8
+1C40701: Alandroal;9,2
+1C40702: Arraiolos;9,9
+1C40703: Borba;44,1
+1C40704: Estremoz;24,4
+1C40705: Évora;41,3
+1C40706: Montemor-o-Novo;12,9
+1C40707: Mora;9,4
+1C40708: Mourão;8,7
+1C40709: Portel;9,5
+1C40710: Redondo;17
+1C40711: Reguengos de Monsaraz;21,3
+1C40712: Vendas Novas;51,9
+1C40713: Viana do Alentejo;14,1
+1C40714: Vila Viçosa;37,5
+1500801: Albufeira;337,9
+1500802: Alcoutim;4,2
+1500803: Aljezur;19,7
+1500804: Castro Marim;22,7
+1500805: Faro;342,9
+1500806: Lagoa;282,4
+1500807: Lagos;162,2
+1500808: Loulé;97,4
+1500809: Monchique;13,5
+1500810: Olhão;344,2
+1500811: Portimão;346,5
+1500812: São Brás de Alportel;75,7
+1500813: Silves;58,1
+1500814: Tavira;45,9
+1500815: Vila do Bispo;33,1
+1500816: Vila Real de Santo António;315,3
+2004301: Angra do Heroísmo;141,4
+2004501: Calheta (R.A.A.);27,7
+2004901: Corvo;25,4
+2004701: Horta;83,6
+2004201: Lagoa (R.A.A.);327,3
+2004801: Lajes das Flores;20,6
+2004601: Lajes do Pico;28,3
+2004602: Madalena;44,4
+2004202: Nordeste;43,7
+2004203: Ponta Delgada;295,1
+2004204: Povoação;55,1
+2004205: Ribeira Grande;179,2
+2004401: Santa Cruz da Graciosa;67,6
+2004802: Santa Cruz das Flores;29,6
+2004603: São Roque do Pico;24
+2004502: Velas;42,2
+2004302: Vila da Praia da Vitória;122,4
+2004101: Vila do Porto;56,8
+2004206: Vila Franca do Campo;133,4
+3003101: Calheta (R.A.M.);100,1
+3003102: Câmara de Lobos;628,4
+3003103: Funchal;1411,2
+3003104: Machico;287,1
+3003105: Ponta do Sol;188,3
+3003106: Porto Moniz;30,5
+3003107: Ribeira Brava;199,8
+3003108: Santa Cruz;543,3
+3003109: Santana;68
+3003110: São Vicente;63,1
+3003201: Porto Santo;130,3
