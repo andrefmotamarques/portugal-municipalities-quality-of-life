@@ -21,7 +21,7 @@ dir.create("results", showWarnings = FALSE)
 ficheiros_csv <- list.files("data/indicators", pattern = "\\.csv$", full.names = TRUE, recursive = FALSE)
 ficheiros_csv <- ficheiros_csv[!grepl("dataset_completo|Resultados_|Interpretacao_", basename(ficheiros_csv))]
 
-cat("Encontrados", length(ficheiros_csv), "ficheiros CSV (Indicadores)\n\n")
+cat("Found", length(ficheiros_csv), "CSV files (indicators)\n\n")
 
 
 limpar_nome <- function(nome) {
@@ -40,7 +40,7 @@ extrair_codigo <- function(texto) {
 }
 
 
-cat("A mapear códigos e nomes...\n")
+cat("Mapping codes and names...\n")
 todos_pares <- list()
 
 for (f in ficheiros_csv) {
@@ -60,7 +60,7 @@ for (f in ficheiros_csv) {
 
 base_identificadores <- unique(do.call(rbind, todos_pares))
 
-cat("A gerar base de unificação inteligente...\n")
+cat("Building the unified identifier table...\n")
 
 base_identificadores$ID_UNICO <- NA
 id_counter <- 0
@@ -102,12 +102,12 @@ for (i in 1:nrow(tabela_mestre)) {
 }
 
 
-cat("\nA processar indicadores...\n")
+cat("\nProcessing indicators...\n")
 lista_indicadores <- list()
 
 for (f in ficheiros_csv) {
   nome_indicador <- gsub("\\.csv$", "", basename(f))
-  cat("Processando:", nome_indicador, "\n")
+  cat("Processing:", nome_indicador, "\n")
   
   dados_raw <- read.csv2(f, header = TRUE, fileEncoding = "Latin1", stringsAsFactors = FALSE, na.strings = c("", " ", "NA"))
   if (ncol(dados_raw) < 2) next
@@ -132,11 +132,11 @@ for (f in ficheiros_csv) {
 }
 
 
-cat("\nA realizar merge final...\n")
+cat("\nRunning the final merge...\n")
 merged_data <- Reduce(function(x, y) merge(x, y, by = "ID_UNICO", all = TRUE), lista_indicadores)
 
 
-cat("A carregar dados de população para normalização...\n")
+cat("Loading population data for normalisation...\n")
 caminho_pop <- "data/population/População residente (N.º) por Local de residência .csv"
 
 if (file.exists(caminho_pop)) {
@@ -160,28 +160,28 @@ if (file.exists(caminho_pop)) {
   
  
   merged_data <- merge(merged_data, df_pop_final, by="ID_UNICO", all.x=TRUE)
-  cat("População anexada. Total regs mapeados:", nrow(df_pop_final), "\n")
+  cat("Population attached. Total records mapped:", nrow(df_pop_final), "\n")
 } else {
-  stop("ERRO: Ficheiro de população não encontrado em: ", caminho_pop)
+  stop("ERROR: Population file not found at: ", caminho_pop)
 }
 
 dataset_final <- merge(tabela_mestre, merged_data, by = "ID_UNICO", all.x = TRUE)
 dataset_final$ID_UNICO <- NULL
 
 
-cat("\nA limpar formatos numéricos...\n")
+cat("\nCleaning numeric formats...\n")
 for(i in 3:ncol(dataset_final)) {
   
   if(is.character(dataset_final[,i])) {
     valores_limpos <- gsub("[%‰]", "", dataset_final[,i])
-    val_limpos <- gsub(" ", "", valores_limpos) # Remover espaços 
+    val_limpos <- gsub(" ", "", valores_limpos) # Remove spaces 
     valores_limpos <- gsub(",", ".", valores_limpos)
     dataset_final[,i] <- as.numeric(valores_limpos)
   }
 }
 
 
-cat("\nA aplicar normalização por habitante...\n")
+cat("\nApplying per-capita normalisation...\n")
 if ("Populacao" %in% names(dataset_final)) {
  
   cols_ignoradas <- c("Codigo_Final", "Localizacao_Final", "Populacao")
@@ -210,12 +210,12 @@ if ("Populacao" %in% names(dataset_final)) {
     }
   }
 } else {
-  warning("Coluna 'Populacao' não encontrada. Normalização abortada.")
+  warning("Column 'Populacao' not found. Normalisation aborted.")
 }
 
 
-cat("Linhas (Municípios):", nrow(dataset_final), "\n")
-cat("Colunas:", ncol(dataset_final), "\n")
+cat("Rows (municipalities):", nrow(dataset_final), "\n")
+cat("Columns:", ncol(dataset_final), "\n")
 
 library(VIM)
 aggr(dataset_final)
@@ -224,7 +224,7 @@ library(mice)
 md.pattern(dataset_final)
 
 
-cat("\nA realizar imputação Múltipla (MICE)...\n")
+cat("\nRunning multiple imputation (MICE)...\n")
 library(mice)
 library(stats)
 
@@ -257,13 +257,17 @@ altamente_cor <- findCorrelation_custom <- function(matriz_cor, cutoff=0.99) {
 cols_to_remove <- altamente_cor(cor_matrix)
 
 if (length(cols_to_remove) > 0) {
-  cat("A remover colunas redundantes (correlação > 0.99) para evitar erros:\n")
+  cat("Removing redundant columns (correlation > 0.99) to avoid errors:\n")
   print(cols_to_remove)
   dados_numericos <- dados_numericos[, !names(dados_numericos) %in% cols_to_remove]
 }
 
 
-cat("A iniciar MICE usando método CART (robusto a colinearidade)...\n")
+cat("Starting MICE with the CART method (robust to collinearity)...\n")
+# mice builds model formulas from column names, so the INE indicator names
+# (with spaces and accents) are swapped for syntactic names during imputation
+nomes_originais <- names(dados_numericos)
+names(dados_numericos) <- make.names(nomes_originais, unique = TRUE)
 imp_model <- mice(dados_numericos, 
                   m = 5, 
                   method = 'cart', 
@@ -272,18 +276,19 @@ imp_model <- mice(dados_numericos,
                   printFlag = FALSE)
 
 dataset_numerico_imputado <- complete(imp_model, 1)
+names(dataset_numerico_imputado) <- nomes_originais
 
 
 dataset_final <- cbind(meta_data, dataset_numerico_imputado)
 
-cat("Imputação MICE (método CART) concluída com sucesso.\n")
+cat("MICE imputation (CART method) completed successfully.\n")
 
 
 write.csv2(dataset_final, "results/dataset_completo_imputado.csv", row.names = FALSE, fileEncoding = "UTF-8")
-cat("\nFicheiro 'dataset_completo_imputado.csv' gerado com sucesso (UTF-8).\n")
+cat("\nFile 'dataset_completo_imputado.csv' written successfully (UTF-8).\n")
 
 
-cat("\nVisualização final de missings (deve estar totalmente azul):\n")
+cat("\nFinal missing-value plot (should be entirely blue):\n")
 aggr(dataset_final)
 print(head(dataset_final[, 1:min(5, ncol(dataset_final))]))
 
@@ -327,7 +332,7 @@ vars_remover <- c(
 vars_existent <- intersect(names(dados_ativos), vars_remover)
 if(length(vars_existent) > 0) {
     dados_ativos <- dados_ativos[, !names(dados_ativos) %in% vars_existent]
-    cat("\n[REMOÇÃO] Variáveis removidas por baixa qualidade estatística:\n")
+    cat("\n[REMOVED] Variables dropped due to low statistical quality:\n")
     print(vars_existent)
 }
 
@@ -335,37 +340,37 @@ if(length(vars_existent) > 0) {
 rownames(dados_ativos) <- make.unique(as.character(dados$Localizacao_Final))
 
 
-cat("\n--- TESTE DE ADEQUAÇÃO KMO (Kaiser-Meyer-Olkin) ---\n")
+cat("\n--- KMO SAMPLING ADEQUACY TEST (Kaiser-Meyer-Olkin) ---\n")
 
 kmo_res <- KMO(dados_ativos)
 print(kmo_res$MSA) 
 
 
-cat("\n--- TESTE DE ESFERICIDADE DE BARTLETT ---\n")
+cat("\n--- BARTLETT'S TEST OF SPHERICITY ---\n")
 
 bartlett_res <- cortest.bartlett(cor(dados_ativos), n = nrow(dados_ativos))
 print(bartlett_res$p.value)
-cat("P-value (deve ser < 0.05):", bartlett_res$p.value, "\n")
+cat("P-value (should be < 0.05):", bartlett_res$p.value, "\n")
 cat("----------------------------------------------------\n")
 
 
 pca_preliminar <- principal(dados_ativos, nfactors = ncol(dados_ativos), rotate = "none")
 eigenvalues <- pca_preliminar$values
 
-cat("\n--- ANÁLISE DE EIGENVALUES (CRITÉRIO DE KAISER) ---\n")
+cat("\n--- EIGENVALUE ANALYSIS (KAISER CRITERION) ---\n")
 print(round(eigenvalues, 3))
 n_fatores_kaiser <- sum(eigenvalues > 1)
 
 
 
 fviz_eig(prcomp(dados_ativos, scale. = TRUE), addlabels = TRUE, ylim = c(0, 50)) +
-  labs(title = "Scree Plot", subtitle = paste("Sugestão Kaiser:", n_fatores_kaiser, "componentes"), y = "% Variância")
+  labs(title = "Scree Plot", subtitle = paste("Kaiser suggestion:", n_fatores_kaiser, "components"), y = "% Variance")
 
 
 n_fatores_final <- 5 
 pca_final <- principal(dados_ativos, nfactors = n_fatores_final, rotate = "varimax", scores = TRUE)
 
-cat("\n--- RESUMO DA PCA COM ROTAÇÃO VARIMAX ---\n")
+cat("\n--- PCA SUMMARY WITH VARIMAX ROTATION ---\n")
 print(pca_final)
 
 
@@ -376,7 +381,7 @@ cargas_df[abs(cargas_df) < 0.3] <- ""
 write.csv2(cargas_df, "results/Interpretacao_Indices_Loadings.csv", row.names = TRUE, fileEncoding = "UTF-8")
 
 
-fa.diagram(pca_final, main = "Estrutura dos Índices (Rotação Varimax)")
+fa.diagram(pca_final, main = "Index Structure (Varimax Rotation)")
 
 
 novos_indices <- cbind(dados[, 1:2], pca_final$scores) 
@@ -424,7 +429,7 @@ dist_corr <- get_dist(dados_cluster, method = "pearson")
 
 
 
-cat("Matrizes de distância calculadas.\n")
+cat("Distance matrices computed.\n")
 
 res_hc <- hclust(dist_eucl, method = "ward.D2")
 
@@ -433,32 +438,30 @@ fviz_dend(res_hc,
           k = 4, 
           color_labels_by_k = TRUE, 
           rect = TRUE,
-          main = "Dendrograma de Municípios (Ward's Method)",
-          xlab = "Municípios",
-          ylab = "Distância")
-# dev.off()
-cat("Dendrograma salvo como 'Clustering_Dendrograma.pdf'.\n")
+          main = "Municipality Dendrogram (Ward's Method)",
+          xlab = "Municipalities",
+          ylab = "Distance")
+cat("Dendrogram displayed.\n")
 
 
 p1 <- fviz_nbclust(dados_cluster, kmeans, method = "wss") +
-  geom_vline(xintercept = 4, linetype = 2) + # Sugestão inicial
-  labs(title = "Método Elbow")
+  geom_vline(xintercept = 4, linetype = 2) + # Initial suggestion
+  labs(title = "Elbow Method")
 
 
 p2 <- fviz_nbclust(dados_cluster, kmeans, method = "silhouette") +
-  labs(title = "Método Silhouette")
+  labs(title = "Silhouette Method")
 
 
 gridExtra::grid.arrange(p1, p2, ncol = 2)
-# dev.off()
 
-cat("Gráficos de decisão de K salvos em 'Clustering_Determinacao_K.pdf'.\n")
-cat("Por favor, analise os gráficos para definir o K final para o K-Means.\n")
+cat("K selection plots displayed.\n")
+cat("Please review the plots to choose the final K for K-Means.\n")
 
 
 k_escolhido <- 5
 
-cat(paste("\n--- EXECUTANDO K-MEANS COM K =", k_escolhido, "---\n"))
+cat(paste("\n--- RUNNING K-MEANS WITH K =", k_escolhido, "---\n"))
 
 
 set.seed(123) 
@@ -468,10 +471,9 @@ km_res <- kmeans(dados_cluster, centers = k_escolhido, nstart = 25)
 fviz_cluster(km_res, data = dados_cluster,
              palette = "jco",
              ggtheme = theme_minimal(),
-             main = paste("Mapa de Clusters (K =", k_escolhido, ")"),
+             main = paste("Cluster Map (K =", k_escolhido, ")"),
              repel = TRUE) 
-# dev.off()
-cat("Mapa de Clusters salvo em 'Clustering_Mapa_Final.pdf'.\n")
+cat("Cluster map displayed.\n")
 
 
 dados_finais <- dados_pca 
@@ -485,7 +487,7 @@ perfil_medias_print <- perfil_medias
 cols_num <- sapply(perfil_medias_print, is.numeric)
 perfil_medias_print[, cols_num] <- round(perfil_medias_print[, cols_num], 2)
 
-print("\n--- PERFIL DOS CLUSTERS (Médias dos Scores) ---")
+print("\n--- CLUSTER PROFILES (Mean Scores) ---")
 print(perfil_medias_print)
 
 
@@ -510,17 +512,16 @@ p_heat <- ggplot(perfil_long, aes(x = Componente, y = factor(Cluster), fill = Sc
   geom_text(aes(label = round(Score, 2)), color = "black", size = 3) +
   scale_fill_gradient2(low = "#2166AC", mid = "#F7F7F7", high = "#B2182B", midpoint = 0) +
   theme_minimal() +
-  labs(title = "Perfil dos Clusters (Valores Médios Padronizados)", 
-       subtitle = "Vermelho = Acima da Média Global | Azul = Abaixo da Média Global",
+  labs(title = "Cluster Profiles (Standardised Mean Values)", 
+       subtitle = "Red = Above Overall Mean | Blue = Below Overall Mean",
        y = "Cluster", x = "") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 print(p_heat)
-# dev.off()
-cat("Heatmap salvo em 'Clustering_Heatmap_Perfil.pdf'.\n")
+cat("Heatmap displayed.\n")
 
 
-cat("\n--- INICIANDO PROFILING COM VARIÁVEIS EXTERNAS ('Profile - Normalizado') ---\n")
+cat("\n--- STARTING PROFILING WITH EXTERNAL VARIABLES ('Profile - Normalised') ---\n")
 
 
 extrair_codigo <- function(texto) {
@@ -547,7 +548,7 @@ if(file.exists(file_pop)) {
     stringsAsFactors = FALSE
   )
 } else {
-  stop("ERRO: Ficheiro de população não encontrado para normalização.")
+  stop("ERROR: Population file not found for normalisation.")
 }
 
 
@@ -562,7 +563,7 @@ df_perfil_ext$Codigo_Match <- extrair_codigo(df_perfil_ext$Codigo_Final)
 
 for (f in files_profile) {
   nome_var <- gsub("\\.csv$", "", basename(f))
-  cat("Processando:", nome_var, "...\n")
+  cat("Processing:", nome_var, "...\n")
   
   d_raw <- read.csv2(f, header = TRUE, fileEncoding = "Latin1", stringsAsFactors = FALSE)
   d_clean <- data.frame(
@@ -584,13 +585,13 @@ for (f in files_profile) {
   
   if (grepl("natalidade", nome_var, ignore.case = TRUE)) {
     
-    cat("  -> Normalizando: / 1000 (Taxa)\n")
+    cat("  -> Normalising: / 1000 (rate)\n")
     valores_finais <- valores_finais / 1000
     nome_var <- paste(nome_var, "(por hab)")
     
   } else {
     
-    cat("  -> Normalizando: / População\n")
+    cat("  -> Normalising: / population\n")
     
     
     pop_vals <- rep(NA, nrow(df_perfil_ext))
@@ -614,7 +615,7 @@ df_perfil_ext$Codigo_Match <- NULL
 vars_ext <- names(df_perfil_ext)[4:ncol(df_perfil_ext)]
 perfil_ext_medias <- aggregate(. ~ Cluster, data = df_perfil_ext[, c("Cluster", vars_ext)], mean, na.rm=TRUE)
 
-print("\n--- PERFIL ESTENDIDO (Variáveis Externas) ---")
+print("\n--- EXTENDED PROFILE (External Variables) ---")
 
 perfil_ext_print <- perfil_ext_medias
 perfil_ext_print[,-1] <- round(perfil_ext_print[,-1], 6) 
@@ -643,20 +644,19 @@ p_heat_ext <- ggplot(perfil_ext_long, aes(x = Variavel, y = factor(Cluster), fil
   geom_text(aes(label = round(Valor, 2)), color = "black", size = 3) +
   scale_fill_gradient2(low = "#2166AC", mid = "#F7F7F7", high = "#B2182B", midpoint = 0) +
   theme_minimal() +
-  labs(title = "Perfil Extendido dos Clusters (Variáveis de Validação)", 
-       subtitle = "Valores Padronizados (Z-Score) | Vermelho = Superior à Média dos Clusters",
+  labs(title = "Extended Cluster Profiles (Validation Variables)", 
+       subtitle = "Standardised Values (Z-Score) | Red = Above the Cluster Mean",
        y = "Cluster", x = "") +
   theme(axis.text.x = element_text(angle = 50, hjust = 1, size=8))
 
 print(p_heat_ext)
-# dev.off()
-cat("Heatmap externo salvo em 'Clustering_Heatmap_Perfil_Externo.pdf'.\n")
+cat("External heatmap displayed.\n")
 
 
-cat("Heatmap externo salvo em 'Clustering_Heatmap_Perfil_Externo.pdf'.\n")
+cat("External heatmap displayed.\n")
 
 
-cat("\n--- GERANDO VISUALIZAÇÕES AVANÇADAS (Silhouette, Uncertainty, Scatter, Density) ---\n")
+cat("\n--- GENERATING ADVANCED VISUALISATIONS (Silhouette, Uncertainty, Scatter, Density) ---\n")
 
 
 if(!require(mclust)) install.packages("mclust")
@@ -665,18 +665,16 @@ library(mclust)
 
 
 sil <- silhouette(km_res$cluster, dist(dados_cluster))
-fviz_silhouette(sil, palette = "jco", ggtheme = theme_minimal(), main = "Gráfico de Silhueta (K-Means)")
-# dev.off()
-cat("-> Silhueta salva em 'Visualizacao_Silhouette_Plot.pdf'.\n")
+fviz_silhouette(sil, palette = "jco", ggtheme = theme_minimal(), main = "Silhouette Plot (K-Means)")
+cat("-> Silhouette plot displayed.\n")
 
 
-cat("   A executar Mclust (Model-Based) para gerar Uncertainty Plot...\n")
+cat("   Running Mclust (model-based) to produce the uncertainty plot...\n")
 mc_res <- Mclust(dados_cluster, G = k_escolhido) 
 
 
-plot(mc_res, what = "uncertainty", main = "Gráfico de Incerteza (Model-Based Clustering)")
-# dev.off()
-cat("-> Uncertainty Plot salvo em 'Visualizacao_Uncertainty_Plot.pdf'.\n")
+plot(mc_res, what = "uncertainty", main = "Uncertainty Plot (Model-Based Clustering)")
+cat("-> Uncertainty plot displayed.\n")
 
 
 cols_plot <- colnames(dados_cluster)[1:min(4, ncol(dados_cluster))]
@@ -684,38 +682,35 @@ cols_plot <- colnames(dados_cluster)[1:min(4, ncol(dados_cluster))]
 pairs(dados_cluster[, cols_plot], 
       col = km_res$cluster, 
       pch = 19, 
-      main = "Scatterplots Bivariados (Cores = Clusters)",
+      main = "Bivariate Scatterplots (Colours = Clusters)",
       lower.panel = NULL) 
 
 par(xpd=TRUE)
 legend("bottomleft", legend = unique(km_res$cluster), fill = unique(km_res$cluster), title = "Cluster")
-# dev.off()
-cat("-> Scatterplots salvos em 'Visualizacao_Scatterplots_Bivariados.pdf'.\n")
+cat("-> Scatterplots displayed.\n")
 
 
 clusplot(dados_cluster, km_res$cluster, 
          color=TRUE, shade=TRUE, 
          labels=2, lines=0, 
-         main="Clusplot (Componentes Principais)")
-# dev.off()
-cat("-> Clusplot salvo em 'Visualizacao_Clusplot.pdf'.\n")
+         main="Clusplot (Principal Components)")
+cat("-> Clusplot displayed.\n")
 
 df_plot <- cbind(dados_cluster, Cluster = as.factor(km_res$cluster))
 
 p_dens1 <- ggplot(df_plot, aes(x = df_plot[,1], fill = Cluster)) + 
   geom_density(alpha = 0.4) +
-  labs(title = paste("Densidade por Cluster -", names(df_plot)[1]), x = "Score") +
+  labs(title = paste("Density by Cluster -", names(df_plot)[1]), x = "Score") +
   theme_minimal()
 
 p_dens2 <- ggplot(df_plot, aes(x = df_plot[,2], fill = Cluster)) + 
   geom_density(alpha = 0.4) +
-  labs(title = paste("Densidade por Cluster -", names(df_plot)[2]), x = "Score") +
+  labs(title = paste("Density by Cluster -", names(df_plot)[2]), x = "Score") +
   theme_minimal()
 
 
 gridExtra::grid.arrange(p_dens1, p_dens2, ncol = 2)
-# dev.off()
-cat("-> Density Plots salvos em 'Visualizacao_Density_Plots.pdf'.\n")
+cat("-> Density plots displayed.\n")
 
 
 dados_finais_completo <- merge(dados_finais, df_perfil_ext[, c("Codigo_Final", vars_ext)], by="Codigo_Final")
@@ -725,10 +720,10 @@ dados_finais_completo <- merge(dados_finais_completo, mclust_class, by="Codigo_F
 
 write.csv2(dados_finais_completo, "results/Resultados_Clustering_Final.csv", row.names = FALSE, fileEncoding = "UTF-8")
 
-cat("\nAnálise Concluída!\n")
-cat("1. Verifique a pasta para todos os novos PDFs ('Visualizacao_*.pdf').\n")
-cat("2. Analise 'Resumo_Perfil_Clusters.csv' (Índices PCA) e 'Resumo_Perfil_Externo.csv' (Novas Variáveis).\n")
-cat("3. Dataset final atualizado em 'Resultados_Clustering_Final.csv' (inclui Clusters K-means e Mclust).\n")
+cat("\nAnalysis complete!\n")
+cat("1. The plots are shown in the plots pane (RStudio) or in Rplots.pdf (Rscript).\n")
+cat("2. Review 'Resumo_Perfil_Clusters.csv' (PCA indices) and 'Resumo_Perfil_Externo.csv' (new variables).\n")
+cat("3. Final dataset updated in 'Resultados_Clustering_Final.csv' (includes K-means and Mclust clusters).\n")
 
 
 

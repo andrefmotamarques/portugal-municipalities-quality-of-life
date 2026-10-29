@@ -46,7 +46,7 @@ source("install_packages.R")
 source("quality_of_life_index.R")
 ```
 
-The script moves to its own folder, reads the INE files from `data/` and writes its outputs to `results/`, so it works from RStudio, `Rscript` or `source()` wherever the repository was downloaded. The `results/` folder already contains the outputs, so they can be inspected without running anything.
+The script moves to its own folder, reads the INE files from `data/` and writes its outputs to `results/`, so it works from RStudio, `Rscript` or `source()` wherever the repository was downloaded. The `results/` folder already contains the outputs, so they can be inspected without running anything. Re-running the script overwrites them. The multiple imputation step (MICE) can give slightly different values across R and package versions, so a new run produces very similar but not identical indices and cluster assignments.
 
 ## Tech stack
 
